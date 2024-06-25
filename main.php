@@ -2,24 +2,16 @@
 
 include __DIR__ . '/vendor/autoload.php';
 
+use Umpire\Bot;
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
 use Discord\WebSockets\Intents;
 use Discord\WebSockets\Event;
 
-// loads our .env
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-// require our .env variables to be set
-$dotenv
-    ->required(['UMPIRE_TOKEN', 'UMPIRE_GUILD_ID', 'UMPIRE_CHANNEL_ID'])
-    ->notEmpty();
-
-// .env variables for our bot
-$token = $_ENV['UMPIRE_TOKEN'];
-$serverId = $_ENV['UMPIRE_GUILD_ID'];
-$channelId = $_ENV['UMPIRE_CHANNEL_ID'];
+$bot = new Bot();
+$token = $bot->token;
+$serverId = $bot->serverId;
+$channelId = $bot->channelId;
 
 $discord = new Discord([
     'token' => $token,
@@ -34,17 +26,36 @@ $discord->on('ready', function () use ($discord, $serverId, $channelId) {
         Discord $discord,
     ) {
         $content = $message->content;
-        $phrases = [ // feature: topic analysis instead of phrases
-            'baseball', 'phils', 'phillies',
-            'harper', 'trea', 'ranger',
-            'bohm', 'reserves', 'wheeler',
-            'sanchez', 'strahm', 'marsh',
-            'doomer', 'philly', 'starters',
-            'starter', 'triple play', 'pablo lopez',
-            'peds', 'mlb', 'catcher',
-            'pitcher', 'bat', 'walker',
-            'gave up a run', 'bum', 'taijuan',
-            'yank'
+        $phrases = [
+            // feature: topic analysis instead of phrases
+            'baseball',
+            'phils',
+            'phillies',
+            'harper',
+            'trea',
+            'ranger',
+            'bohm',
+            'reserves',
+            'wheeler',
+            'sanchez',
+            'strahm',
+            'marsh',
+            'doomer',
+            'philly',
+            'starters',
+            'starter',
+            'triple play',
+            'pablo lopez',
+            'peds',
+            'mlb',
+            'catcher',
+            'pitcher',
+            'bat',
+            'walker',
+            'gave up a run',
+            'bum',
+            'taijuan',
+            'yank',
         ];
 
         if (\Discord\contains(strtolower($content), $phrases)) {
