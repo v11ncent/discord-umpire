@@ -4,3 +4,6 @@ vendor/
 
 # Files
 .env
+
+# IntelliJ -- Add this to global .gitignore config file
+.idea/
