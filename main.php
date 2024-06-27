@@ -2,6 +2,8 @@
 
 include __DIR__ . '/vendor/autoload.php';
 
-use Umpire\UmpireSingleton;
+use Umpire\Umpire;
 
-$umpire = UmpireSingleton::get();
+$umpire = new Umpire();
+$token = $umpire->getToken();
+echo $token;
