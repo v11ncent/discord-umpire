@@ -19,12 +19,13 @@ class Umpire
 
     /**
      * @param string|null $token The Discord bot token.
+     * @param array|null $topics An array of topics to watch.
      *
      * @return void
      *
      * @throws IntentException thrown when an invalid intent is given.
      */
-    public function __construct(?string $token = null)
+    public function __construct(?string $token = null, ?array $topics = ['baseball'])
     {
         if ($token == null) {
             $dotenv = Dotenv::createImmutable(dirname(__DIR__, 1));
@@ -34,6 +35,8 @@ class Umpire
         } else {
             $this->setToken($token);
         }
+
+        $this->setTopics($topics);
 
         $this->instance = new Discord([
             'token' => $this->token,
@@ -143,7 +146,7 @@ class Umpire
      */
     public static function startTopicThread(
         Message $message,
-        ?int $auto_archive_duration = 30,
+        ?int $auto_archive_duration = 60,
     ): void {
         $content = $message->content;
         $message->startThread($content, $auto_archive_duration);
