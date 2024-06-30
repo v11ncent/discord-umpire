@@ -21,5 +21,11 @@ $client->on('ready', function (Discord $client) use ($umpire) {
         if (\Discord\contains($message->content, $umpire->getTopics())) {
             $umpire->startTopicThread($message);
         }
+
+        try {
+            $umpire->playSoundOnEntrance('foghorn');
+        } catch (\Discord\Exceptions\FileNotFoundException $e) {
+            echo $e->getMessage();
+        }
     });
 });

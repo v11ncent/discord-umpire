@@ -3,14 +3,17 @@
 namespace Umpire;
 
 use Discord\Discord;
+use Discord\Exceptions\FileNotFoundException;
 use Discord\Exceptions\IntentException;
 use Discord\Parts\Channel\Channel;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\Guild\Guild;
+use Discord\Voice\VoiceClient;
 use Dotenv\Dotenv;
 
 class Umpire
 {
+    private const string SOUND_DIRECTORY = __DIR__ . "/sounds/";
     private Guild $guild;
     private Channel $channel;
     private Discord $instance;
@@ -150,5 +153,24 @@ class Umpire
     ): void {
         $content = $message->content;
         $message->startThread($content, $auto_archive_duration);
+    }
+
+    /**
+     * Plays a sound in a `Channel`.
+     *
+     * @param string $sound The sound to be played.
+     *
+     * @throws FileNotFoundException
+     */
+    public function playSoundOnEntrance(string $sound): void {
+        $file = self::SOUND_DIRECTORY . $sound . ".mp3";
+
+        if (! file_exists($file)) {
+            throw new FileNotFoundException('Sound file not found at ' . $file);
+        }
+
+        if (file_exists($file)) {
+            echo 'File exists!';
+        }
     }
 }
