@@ -17,7 +17,9 @@ $client->on('ready', function (Discord $client) use ($umpire) {
         $umpire->setGuild($server);
     }
 
-    $client->on(Event::MESSAGE_CREATE, function (Message $message) use ($umpire) {
+    $client->on(Event::MESSAGE_CREATE, function (Message $message) use (
+        $umpire,
+    ) {
         if (\Discord\contains($message->content, $umpire->getTopics())) {
             $umpire->startTopicThread($message);
         }

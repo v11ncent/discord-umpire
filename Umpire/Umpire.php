@@ -13,7 +13,7 @@ use Dotenv\Dotenv;
 
 class Umpire
 {
-    private const string SOUND_DIRECTORY = __DIR__ . "/sounds/";
+    private const string SOUND_DIRECTORY = __DIR__ . '/sounds/';
     private Guild $guild;
     private Channel $channel;
     private Discord $instance;
@@ -28,8 +28,10 @@ class Umpire
      *
      * @throws IntentException thrown when an invalid intent is given.
      */
-    public function __construct(?string $token = null, ?array $topics = ['baseball'])
-    {
+    public function __construct(
+        ?string $token = null,
+        ?array $topics = ['baseball'],
+    ) {
         if ($token == null) {
             $dotenv = Dotenv::createImmutable(dirname(__DIR__, 1));
             $dotenv->load();
@@ -162,15 +164,20 @@ class Umpire
      *
      * @throws FileNotFoundException
      */
-    public function playSoundOnEntrance(string $sound): void {
-        $file = self::SOUND_DIRECTORY . $sound . ".mp3";
-
-        if (! file_exists($file)) {
-            throw new FileNotFoundException('Sound file not found at ' . $file);
-        }
+    public function playSoundOnEntrance(string $sound): void
+    {
+        $file = self::SOUND_DIRECTORY . $sound . '.mp3';
 
         if (file_exists($file)) {
-            echo 'File exists!';
+            $guild = $this->getGuild();
+
+            $this->instance->joinVoiceChannel(
+                $guild->channels->get('id', '1025455681987412028'),
+            )->done(function (VoiceClient $client) use ($file) {
+                $client->playFile($file);
+            });
+        } else {
+            throw new FileNotFoundException('Sound file not found at ' . $file);
         }
     }
 }
