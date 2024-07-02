@@ -3,17 +3,17 @@
 namespace Umpire;
 
 use Discord\Discord;
-use Discord\Exceptions\FileNotFoundException;
 use Discord\Exceptions\IntentException;
 use Discord\Parts\Channel\Channel;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\Guild\Guild;
 use Discord\Voice\VoiceClient;
+use Discord\WebSockets\Intents;
 use Dotenv\Dotenv;
 
 class Umpire
 {
-    private const string SOUND_DIRECTORY = __DIR__ . '/sounds/';
+    private const string SOUND_DIRECTORY = __DIR__ . '\\sounds\\';
     private Guild $guild;
     private Channel $channel;
     private Discord $instance;
@@ -45,6 +45,7 @@ class Umpire
 
         $this->instance = new Discord([
             'token' => $this->token,
+            'intents' => Intents::getAllIntents()
         ]);
     }
 
@@ -161,23 +162,19 @@ class Umpire
      * Plays a sound in a `Channel`.
      *
      * @param string $sound The sound to be played.
-     *
-     * @throws FileNotFoundException
+     * @param Channel $channel The channel to play the sound in.
      */
-    public function playSoundOnEntrance(string $sound): void
+    public function playSoundOnEntrance(string $sound, Channel $channel): void
     {
-        $file = self::SOUND_DIRECTORY . $sound . '.mp3';
+        $file = self::SOUND_DIRECTORY . $sound . '.wav';
 
-        if (file_exists($file)) {
-            $guild = $this->getGuild();
-
-            $this->instance->joinVoiceChannel(
-                $guild->channels->get('id', '1025455681987412028'),
-            )->done(function (VoiceClient $client) use ($file) {
-                $client->playFile($file);
+        // Exception is already handled in `playFile()`; no need to wrap in try-catch
+        $this->instance
+            ->joinVoiceChannel($channel)
+            ->then(function (VoiceClient $client) use ($file) {
+                $client->playFile($file)->then(function () use ($client) {
+                    $client->close();
+                });
             });
-        } else {
-            throw new FileNotFoundException('Sound file not found at ' . $file);
-        }
     }
 }

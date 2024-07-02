@@ -3,7 +3,7 @@
 include __DIR__ . '/vendor/autoload.php';
 
 use Discord\Discord;
-use Discord\Parts\Channel\Message;
+use Discord\Parts\WebSockets\VoiceStateUpdate;
 use Discord\WebSockets\Event;
 use Umpire\Umpire;
 
@@ -17,17 +17,15 @@ $client->on('ready', function (Discord $client) use ($umpire) {
         $umpire->setGuild($server);
     }
 
-    $client->on(Event::MESSAGE_CREATE, function (Message $message) use (
-        $umpire,
-    ) {
-        if (\Discord\contains($message->content, $umpire->getTopics())) {
-            $umpire->startTopicThread($message);
-        }
+    $client->on(Event::VOICE_STATE_UPDATE, function (VoiceStateUpdate $voice) use ($umpire) {
+        $user = $voice->member->username;
+        $channel = $voice->channel;
 
-        try {
-            $umpire->playSoundOnEntrance('foghorn');
-        } catch (\Discord\Exceptions\FileNotFoundException $e) {
-            echo $e->getMessage();
+        if (\Discord\contains($user, ['eva'])) {
+            $umpire->playSoundOnEntrance('foghorn', $channel);
+            echo PHP_EOL . 'PLAYED FOGHORN.' . PHP_EOL;
         }
     });
 });
+
+$client->run();
